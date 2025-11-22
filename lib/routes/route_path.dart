@@ -6,8 +6,9 @@ class RPaths {
   const RPaths._();
 
   // auth
+  static const splash = RPath('/splash');
   static const login = RPath('/login');
-  static final signUp = login + const RPath('/sign-up');
+  // static final signUp = login + const RPath('/sign-up');
 
   // home
   static const home = RPath('/home');

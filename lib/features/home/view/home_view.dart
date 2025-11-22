@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:linkify/main.export.dart';
 
 class HomeView extends HookConsumerWidget {
   const HomeView({super.key});
@@ -8,13 +8,13 @@ class HomeView extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(''),
+        title: const Text(kAppName),
+        actions: [
+          CircleAvatar(backgroundColor: context.colors.primary, child: const Icon(Icons.person_rounded)),
+          const Gap(Insets.sm),
+        ],
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [],
-        ),
-      ),
+      body: const SingleChildScrollView(child: Column()),
     );
   }
 }

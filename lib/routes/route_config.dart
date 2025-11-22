@@ -3,8 +3,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:linkify/app_root.dart';
 import 'package:linkify/features/Settings/view/settings_view.dart';
+import 'package:linkify/features/auth/controller/auth_ctrl.dart';
 import 'package:linkify/features/auth/view/login_view.dart';
-import 'package:linkify/features/auth/view/sign_up_view.dart';
 import 'package:linkify/features/home/view/home_view.dart';
 import 'package:linkify/main.export.dart';
 
@@ -32,9 +32,9 @@ class AppRouter extends Notifier<GoRouter> {
 
   /// The app router list
   List<RouteBase> get _routes => [
+    AppRoute(RPaths.splash, (_) => const SplashPage()),
     //! auth
     AppRoute(RPaths.login, (_) => const LoginView()),
-    AppRoute(RPaths.signUp, (_) => const SignUpView()),
 
     //! Home
     AppRoute(RPaths.home, (_) => const HomeView()),
@@ -46,17 +46,22 @@ class AppRouter extends Notifier<GoRouter> {
   GoRouter build() {
     Ctx._key = _rootNavigator;
     Toaster.navigator = _rootNavigator;
-    // final isLoggedIn = ref.watch(authCtrlProvider);
+    final authState = ref.watch(authCtrlProvider);
 
     FutureOr<String?> redirectLogic(ctx, GoRouterState state) async {
       final current = state.uri.toString();
       cat(current, 'route redirect');
+      final isLoadingOrError = authState.isLoading || authState.hasError;
 
-      // if (!isLoggedIn) {
-      //   cat('NOT LOGGED IN', 'route');
-      //   if (current.contains(RPaths.login.path)) return null;
-      //   return RPaths.login.path;
-      // }
+      if (isLoadingOrError) return RPaths.splash.path;
+
+      final isLoggedIn = authState.value == true;
+
+      if (!isLoggedIn) {
+        cat('NOT LOGGED IN', 'route');
+        if (current.contains(RPaths.login.path)) return null;
+        return RPaths.login.path;
+      }
 
       return null;
     }
