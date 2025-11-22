@@ -11,7 +11,8 @@ class RPaths {
   // static final signUp = login + const RPath('/sign-up');
 
   // home
-  static const home = RPath('/home');
+  static const links = RPath('/links');
+  static const addLink = RPath('/add-link');
 
   // settings
   static const settings = RPath('/settings');

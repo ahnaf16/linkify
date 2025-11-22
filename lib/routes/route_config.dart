@@ -5,11 +5,12 @@ import 'package:linkify/app_root.dart';
 import 'package:linkify/features/Settings/view/settings_view.dart';
 import 'package:linkify/features/auth/controller/auth_ctrl.dart';
 import 'package:linkify/features/auth/view/login_view.dart';
-import 'package:linkify/features/home/view/home_view.dart';
+import 'package:linkify/features/link/view/add_link_view.dart';
+import 'package:linkify/features/link/view/links_view.dart';
 import 'package:linkify/main.export.dart';
 
 typedef RouteRedirect = FutureOr<String?> Function(BuildContext, GoRouterState);
-String rootPath = RPaths.home.path;
+String rootPath = RPaths.links.path;
 final routerProvider = NotifierProvider<AppRouter, GoRouter>(AppRouter.new);
 
 class AppRouter extends Notifier<GoRouter> {
@@ -37,7 +38,8 @@ class AppRouter extends Notifier<GoRouter> {
     AppRoute(RPaths.login, (_) => const LoginView()),
 
     //! Home
-    AppRoute(RPaths.home, (_) => const HomeView()),
+    AppRoute(RPaths.links, (_) => const LinksView()),
+    AppRoute(RPaths.addLink, (_) => const AddLinkView()),
 
     AppRoute(RPaths.settings, (_) => const SettingsView()),
   ];

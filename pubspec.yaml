@@ -36,6 +36,12 @@ dependencies:
   url_launcher: ^6.3.2
   firebase_auth: ^6.1.2
   cloud_firestore: ^6.1.0
+  hive_ce: ^2.15.1
+  hive_ce_flutter: ^2.3.3
+  nanoid2: ^2.0.1
+  metadata_fetch: ^0.4.2
+  screwdriver: ^5.11.0
+  any_link_preview: ^3.0.3
 
 dev_dependencies:
   flutter_test:
@@ -45,6 +51,7 @@ dev_dependencies:
   custom_lint: ^0.8.1
   riverpod_lint: ^3.0.3
   riverpod_generator: ^3.0.3
+  hive_ce_generator: ^1.10.0
 
 dependency_overrides:
   toastification: ^2.3.0

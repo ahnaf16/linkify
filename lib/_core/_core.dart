@@ -17,6 +17,7 @@ export 'services/events/app_events.dart';
 export 'services/events/event.dart';
 export 'services/events/event_listeners.dart';
 export 'services/times.dart';
+export 'storage/hive_db.dart';
 export 'strings/app_const.dart';
 export 'strings/auto_fill.dart';
 export 'type_def/helper_types.dart.dart';

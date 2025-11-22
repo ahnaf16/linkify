@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'auth_ctrl.dart';
+part of 'link_ctrl.dart';
 
 // **************************************************************************
 // RiverpodGenerator
@@ -9,43 +9,44 @@ part of 'auth_ctrl.dart';
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
 
-@ProviderFor(AuthCtrl)
-const authCtrlProvider = AuthCtrlProvider._();
+@ProviderFor(LinkCtrl)
+const linkCtrlProvider = LinkCtrlProvider._();
 
-final class AuthCtrlProvider extends $StreamNotifierProvider<AuthCtrl, bool?> {
-  const AuthCtrlProvider._()
+final class LinkCtrlProvider
+    extends $AsyncNotifierProvider<LinkCtrl, List<LinkData>> {
+  const LinkCtrlProvider._()
     : super(
         from: null,
         argument: null,
         retry: null,
-        name: r'authCtrlProvider',
-        isAutoDispose: true,
+        name: r'linkCtrlProvider',
+        isAutoDispose: false,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
 
   @override
-  String debugGetCreateSourceHash() => _$authCtrlHash();
+  String debugGetCreateSourceHash() => _$linkCtrlHash();
 
   @$internal
   @override
-  AuthCtrl create() => AuthCtrl();
+  LinkCtrl create() => LinkCtrl();
 }
 
-String _$authCtrlHash() => r'359a2e894ff553feadac70d96bb7662bb50bc522';
+String _$linkCtrlHash() => r'99fddc80ec0b327e116cee34fd7d553a2a03e168';
 
-abstract class _$AuthCtrl extends $StreamNotifier<bool?> {
-  Stream<bool?> build();
+abstract class _$LinkCtrl extends $AsyncNotifier<List<LinkData>> {
+  FutureOr<List<LinkData>> build();
   @$mustCallSuper
   @override
   void runBuild() {
     final created = build();
-    final ref = this.ref as $Ref<AsyncValue<bool?>, bool?>;
+    final ref = this.ref as $Ref<AsyncValue<List<LinkData>>, List<LinkData>>;
     final element =
         ref.element
             as $ClassProviderElement<
-              AnyNotifier<AsyncValue<bool?>, bool?>,
-              AsyncValue<bool?>,
+              AnyNotifier<AsyncValue<List<LinkData>>, List<LinkData>>,
+              AsyncValue<List<LinkData>>,
               Object?,
               Object?
             >;

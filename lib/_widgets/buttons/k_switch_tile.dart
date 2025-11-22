@@ -21,7 +21,7 @@ class KSwitchTile extends StatelessWidget {
     return GestureDetector(
       onTap: () => onChanged?.call(!value),
       child: DecoContainer(
-        color: context.colors.surface.op2,
+        color: context.colors.surfaceContainer,
         borderRadius: Corners.lg,
         padding: Pads.sym(10, 5),
         child: Row(
@@ -35,7 +35,7 @@ class KSwitchTile extends StatelessWidget {
                 children: [
                   Text(title, style: context.text.bodyLarge!.op(.8)),
                   if (subtitle != null)
-                    Text(subtitle!, style: context.text.bodyMedium!.copyWith(color: context.colors.outline)),
+                    Text(subtitle!, style: context.text.bodyMedium!.copyWith(color: context.colors.outlineVariant.op4)),
                 ],
               ),
             ),

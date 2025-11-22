@@ -30,7 +30,7 @@ class KTextField extends HookWidget {
     this.textInputAction,
     this.autofocus = false,
     this.outsideSuffix,
-    this.isDense = true,
+    this.isDense = false,
     this.prefixText,
     this.textAlign = TextAlign.start,
     this.inputFormatters,
@@ -38,8 +38,8 @@ class KTextField extends HookWidget {
     this.titleStyle,
     this.focusNode,
     this.valueTransformer,
-    this.autofillHints,
-    this.unfocusOutside = true,
+    this.border,
+    this.focusedBorder,
   }) : _key = key,
        super(key: superKey);
 
@@ -53,7 +53,7 @@ class KTextField extends HookWidget {
   final TextInputType? keyboardType;
   final List<FormFieldValidator<String>>? validators;
   final void Function(String value)? onChanged;
-  final void Function(String value)? onSubmitted;
+  final void Function(String? value)? onSubmitted;
   final TextEditingController? controller;
   final int? maxLength;
   final int maxLines;
@@ -74,8 +74,8 @@ class KTextField extends HookWidget {
   final TextStyle? titleStyle;
   final FocusNode? focusNode;
   final dynamic Function(String? value)? valueTransformer;
-  final List<String>? autofillHints;
-  final bool unfocusOutside;
+  final OutlineInputBorder? border;
+  final OutlineInputBorder? focusedBorder;
 
   @override
   Widget build(BuildContext context) {
@@ -83,12 +83,19 @@ class KTextField extends HookWidget {
     final hideText = useState<bool>(true);
 
     final effectiveVPad = isDense ? 10.0 : 15.0;
-    final effectiveHPad = prefixText != null ? 10.0 : (isDense ? 10.0 : 20.0);
+    final effectiveHPad = prefixText != null ? 10.0 : 20.0;
+
+    final effectiveFocusedBorder = (focusedBorder ?? border ?? AppTheme.focusedBorder()).copyWith(
+      borderRadius: borderRadius,
+    );
+    final effectiveEnabledBorder = (border ?? AppTheme.enabledBorder(context.isDark)).copyWith(
+      borderRadius: borderRadius,
+    );
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        if (title != null) Text(title!, style: titleStyle ?? context.text.titleSmall?.medium).required(isRequired),
+        if (title != null) Text(title!, style: titleStyle ?? context.text.titleMedium).required(isRequired),
         if (title != null) const Gap(Insets.sm),
         Row(
           children: [
@@ -101,9 +108,8 @@ class KTextField extends HookWidget {
                 initialValue: initialValue,
                 controller: controller,
                 inputFormatters: inputFormatters,
-                keyboardType: (isPassField && !hideText.value) ? TextInputType.visiblePassword : keyboardType,
+                keyboardType: keyboardType,
                 textInputAction: textInputAction,
-                autofillHints: autofillHints,
                 maxLines: maxLines,
                 maxLength: maxLength,
                 readOnly: readOnly,
@@ -111,12 +117,12 @@ class KTextField extends HookWidget {
                 enabled: enabled,
                 onTap: onTap,
                 onChanged: (v) => onChanged?.call(v ?? ''),
-                onSubmitted: (v) => onSubmitted?.call(v ?? ''),
+                onSubmitted: onSubmitted,
                 valueTransformer: (value) {
                   valueTransformer?.call(value);
                   return name == null ? '' : value;
                 },
-                onTapOutside: (_) => unfocusOutside ? InputUtils.unFocus() : null,
+                onTapOutside: (_) => InputUtils.unFocus(),
                 validator: FormBuilderValidators.compose([
                   if (isRequired) FormBuilderValidators.required(),
                   ...?validators,
@@ -132,20 +138,15 @@ class KTextField extends HookWidget {
                   prefixIcon: prefixIcon,
                   prefixText: prefixText,
                   prefixStyle: context.text.bodyMedium!.op(.5),
-                  alignLabelWithHint: true,
+                  focusedBorder: effectiveFocusedBorder,
+                  enabledBorder: effectiveEnabledBorder,
                   suffixIcon: !isPassField
                       ? (suffixIcon)
-                      : GestureDetector(
-                          onTap: () => hideText.value = !hideText.value,
-                          child: DecoContainer(
-                            // color: Colors.red,
-                            constraints: const BoxConstraints.tightFor(width: 20, height: 20),
-                            alignment: Alignment.centerRight,
-                            child: Center(
-                              child: hideText.value
-                                  ? const Icon(Icons.visibility_off_rounded)
-                                  : const Icon(Icons.visibility_rounded),
-                            ),
+                      : IconButton(
+                          onPressed: () => hideText.value = !hideText.value,
+                          icon: Icon(
+                            hideText.value ? Icons.visibility_off_rounded : Icons.visibility_rounded,
+                            size: 20,
                           ),
                         ),
                 ),
