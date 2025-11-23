@@ -45,23 +45,28 @@ class AddLinkView extends HookConsumerWidget {
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () async {
-          if (loading.value) return;
-          loading.truthy();
-          bool ok;
-          if (editing == null) {
-            ok = await linkCtrl.saveLink();
-          } else {
-            ok = await linkCtrl.updateLink(editing.id);
-          }
-          loading.falsey();
+      floatingActionButton: KeyboardVisibility.builder(
+        builder: (context, s) {
+          if (s.isVisible) return const SizedBox.shrink();
+          return FloatingActionButton.extended(
+            onPressed: () async {
+              if (loading.value) return;
+              loading.truthy();
+              bool ok;
+              if (editing == null) {
+                ok = await linkCtrl.saveLink();
+              } else {
+                ok = await linkCtrl.updateLink(editing.id);
+              }
+              loading.falsey();
 
-          if (context.mounted && ok) context.pop(true);
+              if (context.mounted && ok) context.pop(true);
+            },
+            foregroundColor: context.colors.onSurface,
+            label: Text(editing == null ? 'Save' : 'Update'),
+            icon: const Icon(Icons.save_rounded),
+          );
         },
-        foregroundColor: context.colors.onSurface,
-        label: Text(editing == null ? 'Save' : 'Update'),
-        icon: const Icon(Icons.save_rounded),
       ),
       body: Stack(
         children: [

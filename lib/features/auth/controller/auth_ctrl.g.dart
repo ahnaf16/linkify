@@ -32,7 +32,7 @@ final class AuthCtrlProvider extends $StreamNotifierProvider<AuthCtrl, bool?> {
   AuthCtrl create() => AuthCtrl();
 }
 
-String _$authCtrlHash() => r'359a2e894ff553feadac70d96bb7662bb50bc522';
+String _$authCtrlHash() => r'c6d2f02748ba6b085a322967a5ebe741dd23f398';
 
 abstract class _$AuthCtrl extends $StreamNotifier<bool?> {
   Stream<bool?> build();

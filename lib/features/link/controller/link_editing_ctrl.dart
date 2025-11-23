@@ -102,7 +102,7 @@ class LinkEditingCtrl extends _$LinkEditingCtrl {
     final (isValid, message) = _validate();
     if (!isValid) return Toaster.showError(message).andReturn(false);
 
-    final link = LinkData.fromState(state).copyWith(id: id);
+    final link = LinkData.fromState(state).copyWith(id: id, createdAt: editing?.createdAt);
     final result = await _repo.updateLink(link, true);
     result.fold((l) => Toaster.showError('Failed to update link'), (r) {
       Toaster.showSuccess('Link updated successfully');

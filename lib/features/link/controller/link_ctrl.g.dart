@@ -33,7 +33,7 @@ final class LinkCtrlProvider
   LinkCtrl create() => LinkCtrl();
 }
 
-String _$linkCtrlHash() => r'99fddc80ec0b327e116cee34fd7d553a2a03e168';
+String _$linkCtrlHash() => r'c261244b0d10b0db23564e835395438cae60f0ce';
 
 abstract class _$LinkCtrl extends $AsyncNotifier<List<LinkData>> {
   FutureOr<List<LinkData>> build();
@@ -53,3 +53,43 @@ abstract class _$LinkCtrl extends $AsyncNotifier<List<LinkData>> {
     element.handleValue(ref, created);
   }
 }
+
+@ProviderFor(onRemoteLinkChange)
+const onRemoteLinkChangeProvider = OnRemoteLinkChangeProvider._();
+
+final class OnRemoteLinkChangeProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<List<LinkData>>,
+          List<LinkData>,
+          Stream<List<LinkData>>
+        >
+    with $FutureModifier<List<LinkData>>, $StreamProvider<List<LinkData>> {
+  const OnRemoteLinkChangeProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'onRemoteLinkChangeProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$onRemoteLinkChangeHash();
+
+  @$internal
+  @override
+  $StreamProviderElement<List<LinkData>> $createElement(
+    $ProviderPointer pointer,
+  ) => $StreamProviderElement(pointer);
+
+  @override
+  Stream<List<LinkData>> create(Ref ref) {
+    return onRemoteLinkChange(ref);
+  }
+}
+
+String _$onRemoteLinkChangeHash() =>
+    r'cdf9dc7ad84eae9cb66060a4e04af5f53a816bdd';

@@ -19,8 +19,13 @@ class LinkCtrl extends _$LinkCtrl {
     state = await AsyncValue.guard(() async => await build());
   }
 
-  FVoid syncAll() async {
-    final res = await _repo.syncAll();
+  FVoid syncToRemote() async {
+    final res = await _repo.syncToRemote();
+    res.fold((l) => Toaster.showError(l), (r) => ref.invalidateSelf());
+  }
+
+  FVoid syncToLocal() async {
+    final res = await _repo.syncToLocal();
     res.fold((l) => Toaster.showError(l), (r) => ref.invalidateSelf());
   }
 
@@ -36,4 +41,10 @@ class LinkCtrl extends _$LinkCtrl {
     final res = await _repo.updateLink(link.copyWith(isPinned: !link.isPinned), false);
     res.fold((l) => Toaster.showError(l), (r) => ref.invalidateSelf());
   }
+}
+
+@riverpod
+Stream<List<LinkData>> onRemoteLinkChange(Ref ref) {
+  final repo = locate<LinkRepo>();
+  return repo.watchLinks();
 }

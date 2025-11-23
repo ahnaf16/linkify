@@ -65,16 +65,53 @@ class LinkRepo {
     }
   }
 
-  FutureReport<Unit> syncAll() async {
+  FutureReport<Unit> syncToRemote() async {
+    cat('Syncing to remote from local', 'syncToRemote');
     try {
       if (await _hasConnection() == false) return right(unit);
       final linkBox = await Hive.openBox<LinkData>(HBoxes.linkBoxName);
       final list = linkBox.values.where((e) => !e.isSynced).toList();
 
-      cat(list.length, 'links to sync');
       if (list.isEmpty) return right(unit);
 
       await Future.wait(list.map((e) => _saveToFB(e)));
+
+      return right(unit);
+    } catch (e, s) {
+      return failure(e.toString(), s: s);
+    }
+  }
+
+  FutureReport<Unit> syncToLocal() async {
+    cat('Syncing to local from remote', 'syncToLocal');
+    try {
+      if (await _hasConnection() == false) return right(unit);
+      final uid = FirebaseAuth.instance.currentUser?.uid;
+
+      final query = await _coll.where('userId', isEqualTo: uid).get();
+      final remoteList = query.docs.map((e) => LinkData.fromMap(e.data())).toList();
+
+      final linkBox = await Hive.openBox<LinkData>(HBoxes.linkBoxName);
+      final localList = linkBox.values;
+      final localIds = localList.map((e) => e.id).toList();
+
+      for (final remote in remoteList) {
+        // same item exists in both
+        if (localIds.contains(remote.id)) {
+          final local = localList.firstWhere((e) => e.id == remote.id);
+
+          // when remote is newer update local
+          if (remote.updatedAt.isAfter(local.updatedAt)) {
+            cat('Updating local', 'syncToLocal');
+            await updateLink(remote, false);
+          } else {
+            cat('No need to update', 'syncToLocal');
+          }
+        } else {
+          // item does not exist in local
+          await linkBox.put(remote.id, remote);
+        }
+      }
 
       return right(unit);
     } catch (e, s) {
@@ -110,4 +147,7 @@ class LinkRepo {
       // ignore
     }
   }
+
+  Stream<List<LinkData>> watchLinks() =>
+      _coll.snapshots().map((e) => e.docs.map((e) => LinkData.fromMap(e.data())).toList());
 }

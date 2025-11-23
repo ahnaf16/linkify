@@ -14,7 +14,6 @@ class LinksView extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final auth = ref.watch(authCtrlProvider);
     final authCtrl = useMemoized(() => ref.read(authCtrlProvider.notifier));
     final linksData = ref.watch(linkCtrlProvider);
 
@@ -22,17 +21,20 @@ class LinksView extends HookConsumerWidget {
     final trigger = useState(false);
 
     final syncing = useState(false);
+    final rSync = useState(false);
 
     useEffect(() {
       final connectionChecker = InternetConnectionChecker.instance;
 
       final sub = connectionChecker.onStatusChange.listen((status) {
         if (status == InternetConnectionStatus.connected) {
-          if (syncing.value) return;
+          trigger.toggle();
+
           wait(() async {
-            syncing.value = true;
-            await linkCtrl.syncAll();
-            syncing.value = false;
+            if (rSync.value) return;
+            rSync.value = true;
+            await linkCtrl.syncToLocal();
+            rSync.value = false;
           });
         }
       });
@@ -43,11 +45,20 @@ class LinksView extends HookConsumerWidget {
       };
     }, const []);
 
+    ref.listen(onRemoteLinkChangeProvider, (_, _) {
+      if (rSync.value) return;
+      wait(() async {
+        rSync.value = true;
+        await linkCtrl.syncToLocal();
+        rSync.value = false;
+      });
+    });
+
     useEffect(() {
       if (syncing.value) return;
       wait(() async {
         syncing.value = true;
-        await linkCtrl.syncAll();
+        await linkCtrl.syncToRemote();
         syncing.value = false;
       });
 
@@ -93,32 +104,38 @@ class LinksView extends HookConsumerWidget {
         icon: const Icon(Icons.add),
         label: const Text('Add Link'),
       ),
-      body: AsyncBuilder(
-        asyncValue: linksData,
-        emptyIcon: const Icon(Icons.link_off_rounded, size: 35),
-        emptyText: 'Your saved links will appear here',
-        builder: (links) {
-          links.sort((a, b) => a.isPinned == b.isPinned ? 0 : (a.isPinned ? -1 : 1));
-          links.sortWithDate((e) => e.createdAt);
-          return Refresher(
-            onRefresh: () => linkCtrl.refresh(),
-            child: ListView.separated(
-              padding: Pads.lg(),
-              itemCount: links.length,
-              separatorBuilder: (_, _) => const Gap(Insets.med),
-              itemBuilder: (BuildContext context, int index) {
-                final link = links[index];
-                return LinkCard(
-                  link: link,
-                  syncing: syncing.value,
-                  afterUpdatePop: () {
-                    trigger.toggle();
+      body: Stack(
+        children: [
+          AsyncBuilder(
+            asyncValue: linksData,
+            emptyIcon: const Icon(Icons.link_off_rounded, size: 35),
+            emptyText: 'Your saved links will appear here',
+            builder: (links) {
+              links.sort((a, b) => a.isPinned == b.isPinned ? 0 : (a.isPinned ? -1 : 1));
+              links.sortWithDate((e) => e.createdAt);
+              return Refresher(
+                onRefresh: () => linkCtrl.refresh(),
+                child: ListView.separated(
+                  padding: Pads.lg(),
+                  itemCount: links.length,
+                  separatorBuilder: (_, _) => const Gap(Insets.med),
+                  itemBuilder: (BuildContext context, int index) {
+                    final link = links[index];
+                    return LinkCard(
+                      link: link,
+                      syncing: syncing.value,
+                      afterUpdatePop: () {
+                        trigger.toggle();
+                      },
+                    );
                   },
-                );
-              },
-            ),
-          );
-        },
+                ),
+              );
+            },
+          ),
+          // ignore: deprecated_member_use
+          if (rSync.value) LinearProgressIndicator(year2023: false, backgroundColor: context.colors.primaryContainer),
+        ],
       ),
     );
   }

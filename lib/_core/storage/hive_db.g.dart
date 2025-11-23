@@ -27,13 +27,14 @@ class LinkDataAdapter extends TypeAdapter<LinkData> {
       isSynced: fields[5] == null ? false : fields[5] as bool,
       isPinned: fields[6] == null ? false : fields[6] as bool,
       createdAt: fields[7] as DateTime,
+      updatedAt: fields[10] as DateTime,
     );
   }
 
   @override
   void write(BinaryWriter writer, LinkData obj) {
     writer
-      ..writeByte(10)
+      ..writeByte(11)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -53,7 +54,9 @@ class LinkDataAdapter extends TypeAdapter<LinkData> {
       ..writeByte(8)
       ..write(obj.image)
       ..writeByte(9)
-      ..write(obj.siteName);
+      ..write(obj.siteName)
+      ..writeByte(10)
+      ..write(obj.updatedAt);
   }
 
   @override

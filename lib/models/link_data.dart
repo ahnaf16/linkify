@@ -15,6 +15,7 @@ class LinkData {
     this.isSynced = false,
     this.isPinned = false,
     required this.createdAt,
+    required this.updatedAt,
   });
 
   final String id;
@@ -27,6 +28,7 @@ class LinkData {
   final bool isSynced;
   final bool isPinned;
   final DateTime createdAt;
+  final DateTime updatedAt;
 
   factory LinkData.fromState(LinkState state) => LinkData(
     id: nanoid(),
@@ -39,6 +41,7 @@ class LinkData {
     isSynced: state.isSynced,
     isPinned: state.isPinned,
     createdAt: DateTime.now(),
+    updatedAt: DateTime.now(),
   );
   factory LinkData.fromMap(Map<String, dynamic> map) => LinkData(
     id: map['id'] ?? '',
@@ -51,9 +54,10 @@ class LinkData {
     isSynced: map.parseBool('isSynced'),
     isPinned: map.parseBool('isPinned'),
     createdAt: DateTime.parse(map['createdAt']),
+    updatedAt: map['updatedAt'] != null ? DateTime.parse(map['updatedAt']) : DateTime.now(),
   );
 
-  Map<String, dynamic> toMap() => {
+  Map<String, dynamic> toMap({bool update = false}) => {
     'id': id,
     'url': url,
     'title': title,
@@ -63,7 +67,8 @@ class LinkData {
     'tag': tag,
     'isSynced': isSynced,
     'isPinned': isPinned,
-    'createdAt': createdAt.toIso8601String(),
+    if (!update) 'createdAt': createdAt.toIso8601String(),
+    'updatedAt': updatedAt.toIso8601String(),
   };
 
   LinkData copyWith({
@@ -77,6 +82,7 @@ class LinkData {
     bool? isSynced,
     bool? isPinned,
     DateTime? createdAt,
+    DateTime? updatedAt,
   }) {
     return LinkData(
       id: id ?? this.id,
@@ -89,6 +95,7 @@ class LinkData {
       isSynced: isSynced ?? this.isSynced,
       isPinned: isPinned ?? this.isPinned,
       createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
     );
   }
 }
