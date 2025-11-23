@@ -42,6 +42,11 @@ dependencies:
   metadata_fetch: ^0.4.2
   screwdriver: ^5.11.0
   any_link_preview: ^3.0.3
+  # receive_sharing_intent: ^1.8.1
+  receive_sharing_intent:
+    git:
+      url: https://github.com/KasemJaffer/receive_sharing_intent.git
+      ref: master
 
 dev_dependencies:
   flutter_test:

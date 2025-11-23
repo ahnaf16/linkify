@@ -10,12 +10,27 @@ class AddLinkView extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final url = context.query('url');
     final editing = context.tryGetExtra<LinkData>();
     final formKey = useMemoized(() => GlobalKey<FormBuilderState>());
     final linkState = ref.watch(linkEditingCtrlProvider(editing));
     final linkCtrl = useMemoized(() => ref.read(linkEditingCtrlProvider(editing).notifier));
 
     final loading = useState(false);
+
+    useEffect(() {
+      if (url != null) {
+        wait(() async {
+          linkCtrl.updateUrl(url);
+          loading.truthy();
+          final upData = await linkCtrl.pasteLink();
+          loading.falsey();
+
+          if (upData != null) formKey.currentState?.patchValue(upData);
+        });
+      }
+      return null;
+    }, [url]);
 
     return Scaffold(
       appBar: AppBar(
@@ -57,6 +72,7 @@ class AddLinkView extends HookConsumerWidget {
                     name: 'url',
                     title: 'URL',
                     hintText: 'https://example.com',
+                    initialValue: url ?? editing?.url,
                     onChanged: (v) => linkCtrl.updateUrl(v),
                     outsideSuffix: Opacity(
                       opacity: linkState.url.isNullOrBlank ? .5 : 1,
@@ -90,12 +106,14 @@ class AddLinkView extends HookConsumerWidget {
                     name: 'title',
                     title: 'Title',
                     hintText: 'Link Title',
+                    initialValue: editing?.title,
                     onChanged: (v) => linkCtrl.updateTitle(v),
                   ),
                   KTextField(
                     name: 'desc',
                     title: 'Description',
                     hintText: 'Describe why, what?',
+                    initialValue: editing?.description,
                     maxLines: 3,
                     borderRadius: Corners.medBorder,
                     onChanged: (v) => linkCtrl.updateDescription(v),
