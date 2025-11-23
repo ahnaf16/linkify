@@ -5,7 +5,7 @@ nextTypeId: 1
 types:
   LinkData:
     typeId: 0
-    nextIndex: 11
+    nextIndex: 12
     fields:
       id:
         index: 0
@@ -29,3 +29,5 @@ types:
         index: 9
       updatedAt:
         index: 10
+      aiSummary:
+        index: 11

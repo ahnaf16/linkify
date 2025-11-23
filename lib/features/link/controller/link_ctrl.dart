@@ -1,3 +1,8 @@
+import 'dart:async';
+
+import 'package:firebase_ai/firebase_ai.dart';
+import 'package:html/parser.dart' as html;
+import 'package:http/http.dart' as http;
 import 'package:linkify/features/link/repository/link_repo.dart';
 import 'package:linkify/main.export.dart';
 import 'package:linkify/models/link_data.dart';
@@ -47,4 +52,49 @@ class LinkCtrl extends _$LinkCtrl {
 Stream<List<LinkData>> onRemoteLinkChange(Ref ref) {
   final repo = locate<LinkRepo>();
   return repo.watchLinks();
+}
+
+@riverpod
+class LinkDetailsCtrl extends _$LinkDetailsCtrl {
+  final _repo = locate<LinkRepo>();
+  @override
+  FutureOr<LinkData> build(String id) async {
+    final res = await _repo.getLinkDetails(id);
+    return res.fold((l) => throw l, (r) => r);
+  }
+
+  Future<String> _extractTextFromUrl(String url) async {
+    final response = await http.get(Uri.parse(url));
+    final document = html.parse(response.body);
+
+    return document.body?.text ?? '';
+  }
+
+  Future<bool> generateSummary() async {
+    try {
+      final link = await future;
+      String url = link.url;
+
+      if (!url.startsWith(RegExp('(http(s)://.)'))) url = 'https://$url';
+
+      final text = await _extractTextFromUrl(url);
+
+      final model = FirebaseAI.googleAI().generativeModel(model: 'gemini-2.5-flash');
+
+      final response = await model.generateContent([
+        Content.text('Summarize this text i extracted from the link $url:\n\n$text'),
+      ]);
+
+      final newLink = link.copyWith(aiSummary: () => response.text);
+      state = AsyncData(newLink);
+      final isOk = await _repo.updateLink(newLink, true);
+      unawaited(_repo.syncToRemote().whenComplete(() => ref.invalidate(linkCtrlProvider)));
+      ref.invalidate(linkCtrlProvider);
+
+      return isOk.isRight();
+    } catch (e, s) {
+      catErr('genSummary', e, s);
+      return false;
+    }
+  }
 }

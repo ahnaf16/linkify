@@ -6,6 +6,7 @@ import 'package:linkify/features/Settings/view/settings_view.dart';
 import 'package:linkify/features/auth/controller/auth_ctrl.dart';
 import 'package:linkify/features/auth/view/login_view.dart';
 import 'package:linkify/features/link/view/add_link_view.dart';
+import 'package:linkify/features/link/view/links_details_view.dart';
 import 'package:linkify/features/link/view/links_view.dart';
 import 'package:linkify/main.export.dart';
 
@@ -39,6 +40,7 @@ class AppRouter extends Notifier<GoRouter> {
 
     //! Home
     AppRoute(RPaths.links, (_) => const LinksView()),
+    AppRoute(RPaths.linkDetails(':id'), (s) => const LinksDetailsView()),
     AppRoute(RPaths.addLink, (_) => const AddLinkView()),
 
     AppRoute(RPaths.settings, (_) => const SettingsView()),

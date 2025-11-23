@@ -6,6 +6,7 @@ import 'package:hive_ce_flutter/hive_flutter.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:linkify/main.export.dart';
 import 'package:linkify/models/link_data.dart';
+import 'package:screwdriver/screwdriver.dart';
 
 class LinkRepo {
   final _coll = FirebaseFirestore.instance.collection('links');
@@ -14,6 +15,18 @@ class LinkRepo {
     try {
       final hiveBox = await Hive.openBox<LinkData>(HBoxes.linkBoxName);
       final localLinks = hiveBox.values.toList();
+
+      return right(localLinks);
+    } catch (e, s) {
+      return failure(e.toString(), s: s);
+    }
+  }
+
+  FutureReport<LinkData> getLinkDetails(String id) async {
+    try {
+      final hiveBox = await Hive.openBox<LinkData>(HBoxes.linkBoxName);
+      final localLinks = hiveBox.values.firstWhereOrNull((e) => e.id == id);
+      if (localLinks == null) return failure('Link not found');
 
       return right(localLinks);
     } catch (e, s) {

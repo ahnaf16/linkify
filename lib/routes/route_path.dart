@@ -12,6 +12,7 @@ class RPaths {
 
   // home
   static const links = RPath('/links');
+  static RPath linkDetails(String id) => RPath('/links/details/$id');
   static const addLink = RPath('/add-link');
 
   // settings

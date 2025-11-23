@@ -48,6 +48,9 @@ dependencies:
       url: https://github.com/KasemJaffer/receive_sharing_intent.git
       ref: master
   internet_connection_checker: ^3.0.1
+  firebase_ai: ^3.6.0
+  http: ^1.6.0
+  markdown_widget: ^2.3.2+8
 
 dev_dependencies:
   flutter_test:

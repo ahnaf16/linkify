@@ -16,6 +16,7 @@ class LinkData {
     this.isPinned = false,
     required this.createdAt,
     required this.updatedAt,
+    this.aiSummary,
   });
 
   final String id;
@@ -29,6 +30,7 @@ class LinkData {
   final bool isPinned;
   final DateTime createdAt;
   final DateTime updatedAt;
+  final String? aiSummary;
 
   factory LinkData.fromState(LinkState state) => LinkData(
     id: nanoid(),
@@ -55,6 +57,7 @@ class LinkData {
     isPinned: map.parseBool('isPinned'),
     createdAt: DateTime.parse(map['createdAt']),
     updatedAt: map['updatedAt'] != null ? DateTime.parse(map['updatedAt']) : DateTime.now(),
+    aiSummary: map['aiSummary'],
   );
 
   Map<String, dynamic> toMap({bool update = false}) => {
@@ -69,6 +72,7 @@ class LinkData {
     'isPinned': isPinned,
     if (!update) 'createdAt': createdAt.toIso8601String(),
     'updatedAt': updatedAt.toIso8601String(),
+    'aiSummary': aiSummary,
   };
 
   LinkData copyWith({
@@ -83,6 +87,7 @@ class LinkData {
     bool? isPinned,
     DateTime? createdAt,
     DateTime? updatedAt,
+    ValueGetter<String?>? aiSummary,
   }) {
     return LinkData(
       id: id ?? this.id,
@@ -96,6 +101,7 @@ class LinkData {
       isPinned: isPinned ?? this.isPinned,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
+      aiSummary: aiSummary != null ? aiSummary() : this.aiSummary,
     );
   }
 }

@@ -112,7 +112,7 @@ class LinksView extends HookConsumerWidget {
             emptyText: 'Your saved links will appear here',
             builder: (links) {
               links.sort((a, b) => a.isPinned == b.isPinned ? 0 : (a.isPinned ? -1 : 1));
-              links.sortWithDate((e) => e.createdAt);
+              links = links.sortWith((e) => e.createdAt, Order.orderDate.reverse);
               return Refresher(
                 onRefresh: () => linkCtrl.refresh(),
                 child: ListView.separated(
@@ -150,149 +150,170 @@ class LinkCard extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final linkCtrl = useMemoized(() => ref.read(linkCtrlProvider.notifier));
-    return DecoContainer(
-      borderRadius: Corners.med,
-      color: context.colors.surfaceContainer,
-      padding: Pads.sm(),
-      shadows: [AppTheme.shadow()],
-      child: Stack(
-        children: [
-          Row(
-            spacing: Insets.med,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              PhotoViewWrapper(
-                image: link.image ?? Icons.link,
-                child: UImage(link.image ?? Icons.link, dimension: 100, borderRadius: Corners.sm),
-              ),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(link.title ?? link.url, style: context.text.titleMedium!.bold, maxLines: 2),
-                    if (link.description.isNotNullOrBlank)
-                      Text(link.description!, maxLines: 2, style: context.text.labelMedium),
-                    if (link.siteName.isNotNullOrBlank) ...[const Gap(Insets.sm), OptionChip(label: link.siteName!)],
-                    const Gap(Insets.sm),
-                    Row(
-                      spacing: Insets.sm,
-                      children: [
-                        GestureDetector(
-                          onTap: () {
-                            Haptic.selectionClick();
-                            linkCtrl.pinLink(link);
-                          },
-                          child: DecoContainer.animated(
-                            color: link.isPinned ? context.colors.primaryContainer : context.colors.surfaceContainer,
-                            borderColor: link.isPinned ? context.colors.primaryContainer : context.colors.outline,
-                            borderWidth: 1,
-                            strokeAlign: BorderSide.strokeAlignOutside,
-                            shape: BoxShape.circle,
-                            padding: Pads.all(6),
-                            child: Icon(link.isPinned ? Icons.bookmark_rounded : Icons.bookmark_add_outlined, size: 20),
-                          ),
-                        ),
-                        GestureDetector(
-                          onTap: () {
-                            Haptic.selectionClick();
-                            URLHelper.url(link.url);
-                          },
-                          child: DecoContainer(
-                            borderColor: context.colors.outline,
-                            borderWidth: 1,
-                            shape: BoxShape.circle,
-                            padding: Pads.all(6),
-                            child: const Icon(Icons.open_in_browser_rounded, size: 20),
-                          ),
-                        ),
-                        GestureDetector(
-                          onTap: () => Copier.copy(link.url),
-                          child: DecoContainer(
-                            borderColor: context.colors.outline,
-                            borderWidth: 1,
-                            shape: BoxShape.circle,
-                            padding: Pads.all(6),
-                            child: const Icon(Icons.copy_rounded, size: 20),
-                          ),
-                        ),
-                        const Spacer(),
-                        PopOver(
-                          itemBuilder: (context) => [
-                            if (link.siteName.isNotNullOrBlank) PullDownMenuTitle(title: Text(link.siteName!)),
-                            PullDownMenuItem(
-                              onTap: () async {
-                                final ok = await RPaths.addLink.push(context, extra: link);
+    return GestureDetector(
+      onTap: () => RPaths.linkDetails(link.id).push(context, extra: link),
+      child: DecoContainer(
+        borderRadius: Corners.med,
+        color: context.colors.surfaceContainer,
+        padding: Pads.sm(),
+        shadows: [AppTheme.shadow()],
+        child: Stack(
+          children: [
+            Row(
+              spacing: Insets.med,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                PhotoViewWrapper(
+                  image: link.image ?? Icons.link,
+                  child: UImage(link.image ?? Icons.link, dimension: 100, borderRadius: Corners.sm),
+                ),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(link.title ?? link.url, style: context.text.titleMedium!.bold, maxLines: 2),
+                      if (link.description.isNotNullOrBlank)
+                        Text(link.description!, maxLines: 2, style: context.text.labelMedium),
+                      if (link.siteName.isNotNullOrBlank) ...[const Gap(Insets.sm), OptionChip(label: link.siteName!)],
+                      const Gap(Insets.sm),
+                      LinksActionsWidget(
+                        link: link,
+                        onPinLink: () => linkCtrl.pinLink(link),
+                        onDelete: () => linkCtrl.deleteLink(link),
+                        afterUpdatePop: afterUpdatePop,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
 
-                                if (ok == true) afterUpdatePop?.call();
-                              },
-                              title: 'Edit',
-                              icon: Icons.edit_rounded,
-                            ),
-                            PullDownMenuItem(
-                              onTap: () async {
-                                final res = await showDialog<bool>(
-                                  context: context,
-                                  builder: (ctx) => AlertDialog(
-                                    title: const Text('Delete Link'),
-                                    content: const Text('Are you sure you want to delete this link?'),
-                                    actions: [
-                                      TextButton(
-                                        onPressed: () => Navigator.pop(ctx, false),
-                                        child: const Text('Cancel'),
-                                      ),
-                                      TextButton(
-                                        style: TextButton.styleFrom(foregroundColor: context.colors.error),
-                                        onPressed: () => Navigator.pop(ctx, true),
-                                        child: const Text('Delete'),
-                                      ),
-                                    ],
-                                  ),
-                                );
-                                if (res == true) await linkCtrl.deleteLink(link);
-                              },
-                              title: 'Delete',
-                              icon: Icons.delete_rounded,
-                              isDestructive: true,
-                            ),
-                          ],
-                          buttonBuilder: (context, showMenu) => GestureDetector(
-                            onTap: showMenu,
-                            child: DecoContainer(
-                              shape: BoxShape.circle,
-                              padding: Pads.all(6),
-                              child: const Icon(Icons.more_horiz, size: 20),
-                            ),
-                          ),
+            Positioned(
+              top: 5,
+              left: 5,
+              child: DecoContainer(
+                height: 20,
+                width: 20,
+                padding: Pads.xs(),
+                shape: BoxShape.circle,
+                color: context.colors.primaryContainer.op8,
+                child: FittedBox(
+                  child: syncing
+                      ? const LoadingIndicator()
+                      : Icon(
+                          link.isSynced ? Icons.cloud_done_outlined : Icons.sync_disabled_rounded,
+                          color: context.colors.primary,
+                        ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class LinksActionsWidget extends StatelessWidget {
+  const LinksActionsWidget({super.key, this.onPinLink, required this.link, this.afterUpdatePop, this.onDelete});
+
+  final LinkData link;
+  final Function()? afterUpdatePop;
+  final Function()? onPinLink;
+  final Function()? onDelete;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      spacing: Insets.sm,
+      children: [
+        if (onPinLink != null)
+          GestureDetector(
+            onTap: () {
+              Haptic.selectionClick();
+              onPinLink?.call();
+            },
+            child: DecoContainer.animated(
+              color: link.isPinned ? context.colors.primaryContainer : context.colors.surfaceContainer,
+              borderColor: link.isPinned ? context.colors.primaryContainer : context.colors.outline,
+              borderWidth: 1,
+              strokeAlign: BorderSide.strokeAlignOutside,
+              shape: BoxShape.circle,
+              padding: Pads.all(6),
+              child: Icon(link.isPinned ? Icons.bookmark_rounded : Icons.bookmark_add_outlined, size: 20),
+            ),
+          ),
+        GestureDetector(
+          onTap: () {
+            Haptic.selectionClick();
+            URLHelper.url(link.url);
+          },
+          child: DecoContainer(
+            borderColor: context.colors.outline,
+            borderWidth: 1,
+            shape: BoxShape.circle,
+            padding: Pads.all(6),
+            child: const Icon(Icons.open_in_browser_rounded, size: 20),
+          ),
+        ),
+        GestureDetector(
+          onTap: () => Copier.copy(link.url),
+          child: DecoContainer(
+            borderColor: context.colors.outline,
+            borderWidth: 1,
+            shape: BoxShape.circle,
+            padding: Pads.all(6),
+            child: const Icon(Icons.copy_rounded, size: 20),
+          ),
+        ),
+        const Spacer(),
+        if (onDelete != null)
+          PopOver(
+            itemBuilder: (context) => [
+              if (link.siteName.isNotNullOrBlank) PullDownMenuTitle(title: Text(link.siteName!)),
+              PullDownMenuItem(
+                onTap: () async {
+                  final ok = await RPaths.addLink.push(context, extra: link);
+
+                  if (ok == true) afterUpdatePop?.call();
+                },
+                title: 'Edit',
+                icon: Icons.edit_rounded,
+              ),
+              PullDownMenuItem(
+                onTap: () async {
+                  final res = await showDialog<bool>(
+                    context: context,
+                    builder: (ctx) => AlertDialog(
+                      title: const Text('Delete Link'),
+                      content: const Text('Are you sure you want to delete this link?'),
+                      actions: [
+                        TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancel')),
+                        TextButton(
+                          style: TextButton.styleFrom(foregroundColor: context.colors.error),
+                          onPressed: () => Navigator.pop(ctx, true),
+                          child: const Text('Delete'),
                         ),
                       ],
                     ),
-                  ],
-                ),
+                  );
+                  if (res == true) await onDelete?.call();
+                },
+                title: 'Delete',
+                icon: Icons.delete_rounded,
+                isDestructive: true,
               ),
             ],
-          ),
-
-          Positioned(
-            top: 5,
-            left: 5,
-            child: DecoContainer(
-              height: 20,
-              width: 20,
-              padding: Pads.xs(),
-              shape: BoxShape.circle,
-              color: context.colors.primaryContainer.op8,
-              child: FittedBox(
-                child: syncing
-                    ? const LoadingIndicator()
-                    : Icon(
-                        link.isSynced ? Icons.cloud_done_outlined : Icons.sync_disabled_rounded,
-                        color: context.colors.primary,
-                      ),
+            buttonBuilder: (context, showMenu) => GestureDetector(
+              onTap: showMenu,
+              child: DecoContainer(
+                shape: BoxShape.circle,
+                padding: Pads.all(6),
+                child: const Icon(Icons.more_horiz, size: 20),
               ),
             ),
           ),
-        ],
-      ),
+      ],
     );
   }
 }

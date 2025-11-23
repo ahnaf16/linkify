@@ -93,3 +93,93 @@ final class OnRemoteLinkChangeProvider
 
 String _$onRemoteLinkChangeHash() =>
     r'cdf9dc7ad84eae9cb66060a4e04af5f53a816bdd';
+
+@ProviderFor(LinkDetailsCtrl)
+const linkDetailsCtrlProvider = LinkDetailsCtrlFamily._();
+
+final class LinkDetailsCtrlProvider
+    extends $AsyncNotifierProvider<LinkDetailsCtrl, LinkData> {
+  const LinkDetailsCtrlProvider._({
+    required LinkDetailsCtrlFamily super.from,
+    required String super.argument,
+  }) : super(
+         retry: null,
+         name: r'linkDetailsCtrlProvider',
+         isAutoDispose: true,
+         dependencies: null,
+         $allTransitiveDependencies: null,
+       );
+
+  @override
+  String debugGetCreateSourceHash() => _$linkDetailsCtrlHash();
+
+  @override
+  String toString() {
+    return r'linkDetailsCtrlProvider'
+        ''
+        '($argument)';
+  }
+
+  @$internal
+  @override
+  LinkDetailsCtrl create() => LinkDetailsCtrl();
+
+  @override
+  bool operator ==(Object other) {
+    return other is LinkDetailsCtrlProvider && other.argument == argument;
+  }
+
+  @override
+  int get hashCode {
+    return argument.hashCode;
+  }
+}
+
+String _$linkDetailsCtrlHash() => r'8816ae889f22c267a80c1c067102b819d843fd36';
+
+final class LinkDetailsCtrlFamily extends $Family
+    with
+        $ClassFamilyOverride<
+          LinkDetailsCtrl,
+          AsyncValue<LinkData>,
+          LinkData,
+          FutureOr<LinkData>,
+          String
+        > {
+  const LinkDetailsCtrlFamily._()
+    : super(
+        retry: null,
+        name: r'linkDetailsCtrlProvider',
+        dependencies: null,
+        $allTransitiveDependencies: null,
+        isAutoDispose: true,
+      );
+
+  LinkDetailsCtrlProvider call(String id) =>
+      LinkDetailsCtrlProvider._(argument: id, from: this);
+
+  @override
+  String toString() => r'linkDetailsCtrlProvider';
+}
+
+abstract class _$LinkDetailsCtrl extends $AsyncNotifier<LinkData> {
+  late final _$args = ref.$arg as String;
+  String get id => _$args;
+
+  FutureOr<LinkData> build(String id);
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final created = build(_$args);
+    final ref = this.ref as $Ref<AsyncValue<LinkData>, LinkData>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<AsyncValue<LinkData>, LinkData>,
+              AsyncValue<LinkData>,
+              Object?,
+              Object?
+            >;
+    element.handleValue(ref, created);
+  }
+}

@@ -28,13 +28,14 @@ class LinkDataAdapter extends TypeAdapter<LinkData> {
       isPinned: fields[6] == null ? false : fields[6] as bool,
       createdAt: fields[7] as DateTime,
       updatedAt: fields[10] as DateTime,
+      aiSummary: fields[11] as String?,
     );
   }
 
   @override
   void write(BinaryWriter writer, LinkData obj) {
     writer
-      ..writeByte(11)
+      ..writeByte(12)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -56,7 +57,9 @@ class LinkDataAdapter extends TypeAdapter<LinkData> {
       ..writeByte(9)
       ..write(obj.siteName)
       ..writeByte(10)
-      ..write(obj.updatedAt);
+      ..write(obj.updatedAt)
+      ..writeByte(11)
+      ..write(obj.aiSummary);
   }
 
   @override
