@@ -133,6 +133,7 @@ class LinksView extends HookConsumerWidget {
               );
             },
           ),
+
           // ignore: deprecated_member_use
           if (rSync.value) LinearProgressIndicator(year2023: false, backgroundColor: context.colors.primaryContainer),
         ],
