@@ -82,15 +82,12 @@ class LinkCard extends HookConsumerWidget {
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              spacing: Insets.sm,
               children: [
                 Text(link.title ?? link.url, style: context.text.titleMedium!.bold, maxLines: 2),
-                if (link.description.isNotNullOrBlank) Text(link.description!, style: context.text.titleMedium),
-                if (link.siteName.isNotNullOrBlank)
-                  Row(
-                    spacing: Insets.sm,
-                    children: [OptionChip(label: link.siteName!)],
-                  ),
+                if (link.description.isNotNullOrBlank)
+                  Text(link.description!, maxLines: 2, style: context.text.labelMedium),
+                if (link.siteName.isNotNullOrBlank) ...[const Gap(Insets.sm), OptionChip(label: link.siteName!)],
+                const Gap(Insets.sm),
                 Row(
                   spacing: Insets.sm,
                   children: [

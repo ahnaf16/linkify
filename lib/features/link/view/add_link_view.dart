@@ -34,7 +34,7 @@ class AddLinkView extends HookConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Add a Link'),
+        title: editing == null ? const Text('Add a Link') : const Text('Update Link'),
         actions: [
           IconButton(
             onPressed: () {
@@ -49,7 +49,12 @@ class AddLinkView extends HookConsumerWidget {
         onPressed: () async {
           if (loading.value) return;
           loading.truthy();
-          final ok = await linkCtrl.saveLink();
+          bool ok;
+          if (editing == null) {
+            ok = await linkCtrl.saveLink();
+          } else {
+            ok = await linkCtrl.updateLink(editing.id);
+          }
           loading.falsey();
 
           if (context.mounted && ok) context.pop();

@@ -93,4 +93,18 @@ class LinkEditingCtrl extends _$LinkEditingCtrl {
 
     return result.isRight();
   }
+
+  Future<bool> updateLink(String id) async {
+    final (isValid, message) = _validate();
+    if (!isValid) return Toaster.showError(message).andReturn(false);
+
+    final link = LinkData.fromState(state).copyWith(id: id);
+    final result = await _repo.updateLink(link);
+    result.fold((l) => Toaster.showError('Failed to update link'), (r) {
+      Toaster.showSuccess('Link updated successfully');
+      ref.invalidate(linkCtrlProvider);
+    });
+
+    return result.isRight();
+  }
 }
