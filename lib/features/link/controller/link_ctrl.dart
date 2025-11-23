@@ -14,6 +14,16 @@ class LinkCtrl extends _$LinkCtrl {
     return res.fold((l) => Toaster.showError(l).andReturn([]), (r) => r);
   }
 
+  FVoid refresh() async {
+    state = const AsyncLoading();
+    state = await AsyncValue.guard(() async => await build());
+  }
+
+  FVoid syncAll() async {
+    final res = await _repo.syncAll();
+    res.fold((l) => Toaster.showError(l), (r) => ref.invalidateSelf());
+  }
+
   Future<void> deleteLink(LinkData link) async {
     final res = await _repo.deleteLink(link);
     res.fold((l) => Toaster.showError(l), (r) {
@@ -23,7 +33,7 @@ class LinkCtrl extends _$LinkCtrl {
   }
 
   Future<void> pinLink(LinkData link) async {
-    final res = await _repo.updateLink(link.copyWith(isPinned: !link.isPinned));
+    final res = await _repo.updateLink(link.copyWith(isPinned: !link.isPinned), false);
     res.fold((l) => Toaster.showError(l), (r) => ref.invalidateSelf());
   }
 }

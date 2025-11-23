@@ -20,9 +20,11 @@ class LinkEditingCtrl extends _$LinkEditingCtrl {
 
   Future<SMap?> pasteLink() async {
     try {
-      final url = state.url;
+      String? url = state.url;
 
       if (url == null) return null;
+
+      if (!url.startsWith(RegExp('(http(s)://.)'))) url = 'https://$url';
 
       final isUrlValid = AnyLinkPreview.isValidLink(url, protocols: ['http', 'https']);
 
@@ -76,6 +78,8 @@ class LinkEditingCtrl extends _$LinkEditingCtrl {
 
   (bool, String) _validate() {
     if (state.url.isNullOrBlank) return (false, 'URL is required');
+    final isUrlValid = AnyLinkPreview.isValidLink(state.url!, protocols: ['http', 'https']);
+    if (!isUrlValid) return (false, 'Invalid URL');
 
     return (true, '');
   }
@@ -99,7 +103,7 @@ class LinkEditingCtrl extends _$LinkEditingCtrl {
     if (!isValid) return Toaster.showError(message).andReturn(false);
 
     final link = LinkData.fromState(state).copyWith(id: id);
-    final result = await _repo.updateLink(link);
+    final result = await _repo.updateLink(link, true);
     result.fold((l) => Toaster.showError('Failed to update link'), (r) {
       Toaster.showSuccess('Link updated successfully');
       ref.invalidate(linkCtrlProvider);

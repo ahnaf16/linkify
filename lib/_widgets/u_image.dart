@@ -28,7 +28,7 @@ class UImage extends StatelessWidget {
   /// - `icon data`
   /// - `Base64 string`
   /// - `Uint8List`
-  final dynamic src;
+  final Object src;
 
   final double? height;
   final double? width;
@@ -91,21 +91,20 @@ class UImage extends StatelessWidget {
 class PhotoView extends StatelessWidget {
   const PhotoView(this.image, {super.key});
 
-  final String image;
+  final Object image;
 
-  static void open(BuildContext context, String image) {
+  static void open(BuildContext context, Object image) {
     context.nPush(PhotoView(image), fullScreen: true);
   }
 
   @override
   Widget build(BuildContext context) {
-    final isNetwork = image.startsWith('http');
     return Scaffold(
       appBar: AppBar(),
       body: Center(
         child: KHero(
-          tag: image,
-          child: isNetwork ? UImage(image, fit: BoxFit.contain) : Image.file(File(image), fit: BoxFit.contain),
+          tag: image.toString(),
+          child: UImage(image, fit: BoxFit.contain),
         ),
       ),
     );
@@ -115,13 +114,13 @@ class PhotoView extends StatelessWidget {
 class PhotoViewWrapper extends StatelessWidget {
   const PhotoViewWrapper({super.key, required this.image, required this.child});
 
-  final String image;
+  final Object image;
   final Widget child;
 
   @override
   Widget build(BuildContext context) {
     return KHero(
-      tag: image,
+      tag: image.toString(),
       child: GestureDetector(onTap: () => PhotoView.open(context, image), child: child),
     );
   }

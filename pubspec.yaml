@@ -47,6 +47,7 @@ dependencies:
     git:
       url: https://github.com/KasemJaffer/receive_sharing_intent.git
       ref: master
+  internet_connection_checker: ^3.0.1
 
 dev_dependencies:
   flutter_test:

@@ -32,10 +32,10 @@ class RPath {
 
   final String path;
 
-  void push<T extends Object?>(BuildContext context, {QMap query = const {}, Object? extra}) {
+  Future<T?> push<T extends Object?>(BuildContext context, {QMap query = const {}, Object? extra}) {
     query = query.map((k, v) => MapEntry(k, '$v'));
     final route = Uri(path: path, queryParameters: query).toString();
-    context.push(route, extra: extra);
+    return context.push(route, extra: extra);
   }
 
   void go(BuildContext context, {QMap query = const {}, Object? extra}) {

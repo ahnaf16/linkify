@@ -57,10 +57,10 @@ class AddLinkView extends HookConsumerWidget {
           }
           loading.falsey();
 
-          if (context.mounted && ok) context.pop();
+          if (context.mounted && ok) context.pop(true);
         },
         foregroundColor: context.colors.onSurface,
-        label: const Text('Save'),
+        label: Text(editing == null ? 'Save' : 'Update'),
         icon: const Icon(Icons.save_rounded),
       ),
       body: Stack(
