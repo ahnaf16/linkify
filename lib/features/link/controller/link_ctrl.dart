@@ -13,10 +13,33 @@ part 'link_ctrl.g.dart';
 @Riverpod(keepAlive: true)
 class LinkCtrl extends _$LinkCtrl {
   final _repo = locate<LinkRepo>();
+  List<LinkData> _cachedLinks = [];
   @override
   Future<List<LinkData>> build() async {
     final res = await _repo.getLinks();
-    return res.fold((l) => Toaster.showError(l).andReturn([]), (r) => r);
+    return res.fold((l) => Toaster.showError(l).andReturn([]), (r) {
+      _cachedLinks = r;
+      return r;
+    });
+  }
+
+  FVoid search(String q, {bool onlySiteName = false}) async {
+    q = q.low.trim();
+    if (q.isEmpty) {
+      state = AsyncData(_cachedLinks);
+      return;
+    }
+    final list = await future;
+
+    final filtered = list
+        .where(
+          (e) =>
+              (!onlySiteName && e.title != null && e.title!.low.contains(q)) ||
+              (e.siteName != null && e.siteName!.low.contains(q)) ||
+              (!onlySiteName && e.url.low.contains(q)),
+        )
+        .toList();
+    state = AsyncData(filtered);
   }
 
   FVoid refresh() async {

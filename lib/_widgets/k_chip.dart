@@ -7,7 +7,6 @@ class OptionChip extends StatelessWidget {
     required this.label,
     this.padding,
     this.color,
-    this.onTap,
     this.labelStyle,
     this.borderRadius = 8,
     this.leading,
@@ -19,7 +18,6 @@ class OptionChip extends StatelessWidget {
   final Widget? leading;
   final String label;
   final TextStyle? labelStyle;
-  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {

@@ -22,6 +22,7 @@ class LinksView extends HookConsumerWidget {
 
     final syncing = useState(false);
     final rSync = useState(false);
+    final filters = useState<Set<String>>({});
 
     useEffect(() {
       final connectionChecker = InternetConnectionChecker.instance;
@@ -113,22 +114,53 @@ class LinksView extends HookConsumerWidget {
             builder: (links) {
               links.sort((a, b) => a.isPinned == b.isPinned ? 0 : (a.isPinned ? -1 : 1));
               links = links.sortWith((e) => e.createdAt, Order.orderDate.reverse);
+
               return Refresher(
                 onRefresh: () => linkCtrl.refresh(),
-                child: ListView.separated(
-                  padding: Pads.lg(),
-                  itemCount: links.length,
-                  separatorBuilder: (_, _) => const Gap(Insets.med),
-                  itemBuilder: (BuildContext context, int index) {
-                    final link = links[index];
-                    return LinkCard(
-                      link: link,
-                      syncing: syncing.value,
-                      afterUpdatePop: () {
-                        trigger.toggle();
-                      },
-                    );
-                  },
+                child: Column(
+                  crossAxisAlignment: .start,
+
+                  children: [
+                    if (filters.value.isNotEmpty)
+                      SizedBox(
+                        height: 40,
+                        child: ListView.builder(
+                          padding: Pads.lg('lr'),
+                          itemCount: filters.value.length,
+                          scrollDirection: Axis.horizontal,
+                          itemBuilder: (context, index) {
+                            final value = filters.value.toList()[index];
+                            return RemovableChip(
+                              text: value,
+                              value: value,
+                              onDelete: (value) {
+                                filters.value = {...filters.value}..remove(value);
+                                linkCtrl.search('');
+                              },
+                            );
+                          },
+                        ),
+                      ),
+                    Expanded(
+                      child: ListView.separated(
+                        padding: Pads.lg(),
+                        itemCount: links.length,
+                        separatorBuilder: (_, _) => const Gap(Insets.med),
+                        itemBuilder: (BuildContext context, int index) {
+                          final link = links[index];
+                          return LinkCard(
+                            link: link,
+                            syncing: syncing.value,
+                            afterUpdatePop: () => trigger.toggle(),
+                            onSiteNameTap: (name) async {
+                              await linkCtrl.search(name, onlySiteName: true);
+                              filters.value = {...filters.value, name};
+                            },
+                          );
+                        },
+                      ),
+                    ),
+                  ],
                 ),
               );
             },
@@ -143,10 +175,11 @@ class LinksView extends HookConsumerWidget {
 }
 
 class LinkCard extends HookConsumerWidget {
-  const LinkCard({super.key, required this.link, required this.syncing, this.afterUpdatePop});
+  const LinkCard({super.key, required this.link, required this.syncing, this.afterUpdatePop, this.onSiteNameTap});
   final LinkData link;
   final bool syncing;
   final Function()? afterUpdatePop;
+  final Function(String name)? onSiteNameTap;
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final linkCtrl = useMemoized(() => ref.read(linkCtrlProvider.notifier));
@@ -174,7 +207,13 @@ class LinkCard extends HookConsumerWidget {
                       Text(link.title ?? link.url, style: context.text.titleMedium!.bold, maxLines: 2),
                       if (link.description.isNotNullOrBlank)
                         Text(link.description!, maxLines: 2, style: context.text.labelMedium),
-                      if (link.siteName.isNotNullOrBlank) ...[const Gap(Insets.sm), OptionChip(label: link.siteName!)],
+                      if (link.siteName.isNotNullOrBlank) ...[
+                        const Gap(Insets.sm),
+                        GestureDetector(
+                          onTap: () => onSiteNameTap?.call(link.siteName!),
+                          child: OptionChip(label: link.siteName!),
+                        ),
+                      ],
                       const Gap(Insets.sm),
                       LinksActionsWidget(
                         link: link,
