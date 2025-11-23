@@ -1,6 +1,8 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:linkify/features/auth/controller/auth_ctrl.dart';
+import 'package:linkify/features/auth/view/link_email_dialog.dart';
 import 'package:linkify/features/link/controller/link_ctrl.dart';
 import 'package:linkify/main.export.dart';
 import 'package:linkify/models/link_data.dart';
@@ -12,6 +14,7 @@ class LinksView extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final auth = ref.watch(authCtrlProvider);
     final authCtrl = useMemoized(() => ref.read(authCtrlProvider.notifier));
     final linksData = ref.watch(linkCtrlProvider);
 
@@ -57,7 +60,15 @@ class LinksView extends HookConsumerWidget {
         actions: [
           PopOver(
             itemBuilder: (context) => [
-              const PullDownMenuTitle(title: Text('Guest User')),
+              PullDownMenuTitle(title: Text(FirebaseAuth.instance.currentUser?.email ?? 'Guest User')),
+              if (FirebaseAuth.instance.currentUser?.email == null)
+                PullDownMenuItem(
+                  onTap: () async {
+                    await showDialog(context: context, builder: (context) => const LinkEmailDialog());
+                  },
+                  title: 'Link Email',
+                  icon: Icons.email_rounded,
+                ),
               PullDownMenuItem(onTap: () {}, title: 'Dark Theme', icon: Icons.nightlight_round),
               PullDownMenuItem(onTap: () {}, title: 'Settings', icon: Icons.settings_rounded),
               PullDownMenuItem(

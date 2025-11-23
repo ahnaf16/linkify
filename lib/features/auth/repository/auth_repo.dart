@@ -11,9 +11,14 @@ class AuthRepo {
     }
   }
 
-  FutureReport<Unit> login() async {
+  FutureReport<Unit> login(String? email, String? password) async {
     try {
-      await FirebaseAuth.instance.signInAnonymously();
+      final auth = FirebaseAuth.instance;
+      if (email != null && password != null) {
+        await auth.signInWithEmailAndPassword(email: email, password: password);
+        return right(unit);
+      }
+      await auth.signInAnonymously();
       return right(unit);
     } catch (e, s) {
       return failure(e.toString(), s: s);
@@ -23,6 +28,18 @@ class AuthRepo {
   FutureReport<Unit> logout() async {
     try {
       await FirebaseAuth.instance.signOut();
+      return right(unit);
+    } catch (e, s) {
+      return failure(e.toString(), s: s);
+    }
+  }
+
+  FutureReport<Unit> linkEmail(String email, String password) async {
+    try {
+      final auth = FirebaseAuth.instance;
+      final user = auth.currentUser;
+      if (user == null) return right(unit);
+      await user.linkWithCredential(EmailAuthProvider.credential(email: email, password: password));
       return right(unit);
     } catch (e, s) {
       return failure(e.toString(), s: s);
