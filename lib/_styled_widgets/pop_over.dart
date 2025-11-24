@@ -21,7 +21,7 @@ class PopOver extends StatelessWidget {
                 backgroundColor: ElevationOverlay.applySurfaceTint(
                   context.colors.surface,
                   context.colors.surfaceTint,
-                  1,
+                  0,
                 ),
               ),
               dividerTheme: PullDownMenuDividerTheme(

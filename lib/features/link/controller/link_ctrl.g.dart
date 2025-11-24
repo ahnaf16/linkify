@@ -33,7 +33,7 @@ final class LinkCtrlProvider
   LinkCtrl create() => LinkCtrl();
 }
 
-String _$linkCtrlHash() => r'c261244b0d10b0db23564e835395438cae60f0ce';
+String _$linkCtrlHash() => r'79da2481976d943a71d453dd8c4a04b0d87a4472';
 
 abstract class _$LinkCtrl extends $AsyncNotifier<List<LinkData>> {
   FutureOr<List<LinkData>> build();
@@ -135,7 +135,7 @@ final class LinkDetailsCtrlProvider
   }
 }
 
-String _$linkDetailsCtrlHash() => r'8816ae889f22c267a80c1c067102b819d843fd36';
+String _$linkDetailsCtrlHash() => r'a1a2eadc65640f582068beafbb1cafdeeed2c7da';
 
 final class LinkDetailsCtrlFamily extends $Family
     with

@@ -53,6 +53,7 @@ dependencies:
   markdown_widget: ^2.3.2+8
   auto_animated_list: ^2.0.0
   automatic_animated_list: ^1.0.0
+  family_bottom_sheet: ^0.1.0
 
 dev_dependencies:
   flutter_test:

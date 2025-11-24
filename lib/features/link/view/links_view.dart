@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:linkify/features/auth/controller/auth_ctrl.dart';
 import 'package:linkify/features/auth/view/link_email_dialog.dart';
+import 'package:linkify/features/category/view/category_sheet_view.dart';
 import 'package:linkify/features/link/controller/link_ctrl.dart';
 import 'package:linkify/main.export.dart';
 import 'package:linkify/models/link_data.dart';
@@ -94,8 +95,12 @@ class LinksView extends HookConsumerWidget {
                   title: 'Link Email',
                   icon: Icons.email_rounded,
                 ),
-              PullDownMenuItem(onTap: () {}, title: 'Dark Theme', icon: Icons.nightlight_round),
-              PullDownMenuItem(onTap: () {}, title: 'Settings', icon: Icons.settings_rounded),
+              PullDownMenuItem(
+                onTap: () => CategorySheetView.show(context),
+                title: 'Category',
+                icon: Icons.category_outlined,
+              ),
+              PullDownMenuItem(onTap: () {}, title: 'Tags', icon: Icons.sell_outlined),
               PullDownMenuItem(
                 onTap: () => authCtrl.logout(),
                 title: 'Logout',

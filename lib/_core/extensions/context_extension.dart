@@ -1,3 +1,4 @@
+import 'package:family_bottom_sheet/family_bottom_sheet.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -31,6 +32,9 @@ extension RouteEx on BuildContext {
     final route = MaterialPageRoute<T>(builder: (c) => page);
     return Navigator.of(this).pushReplacement(route);
   }
+
+  void fmsPush(Widget page) => FamilyModalSheet.of(this).pushPage(page);
+  void fmsPop() => FamilyModalSheet.of(this).popPage();
 }
 
 extension ContextEx on BuildContext {

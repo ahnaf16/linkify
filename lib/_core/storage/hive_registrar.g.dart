@@ -7,12 +7,16 @@ import 'package:linkify/_core/storage/hive_db.dart';
 
 extension HiveRegistrar on HiveInterface {
   void registerAdapters() {
+    registerAdapter(CategoryAdapter());
     registerAdapter(LinkDataAdapter());
+    registerAdapter(TagAdapter());
   }
 }
 
 extension IsolatedHiveRegistrar on IsolatedHiveInterface {
   void registerAdapters() {
+    registerAdapter(CategoryAdapter());
     registerAdapter(LinkDataAdapter());
+    registerAdapter(TagAdapter());
   }
 }
