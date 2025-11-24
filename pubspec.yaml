@@ -51,6 +51,8 @@ dependencies:
   firebase_ai: ^3.6.0
   http: ^1.6.0
   markdown_widget: ^2.3.2+8
+  auto_animated_list: ^2.0.0
+  automatic_animated_list: ^1.0.0
 
 dev_dependencies:
   flutter_test:

@@ -27,6 +27,7 @@ class LoginView extends HookConsumerWidget {
                 style: context.text.bodyLarge,
                 textAlign: TextAlign.center,
               ),
+
               const Gap(Insets.offset),
 
               KTextField(hintText: 'Email', controller: emailCtrl, isDense: true),
@@ -34,39 +35,47 @@ class LoginView extends HookConsumerWidget {
               KTextField(hintText: 'Password', controller: passwordCtrl, isDense: true, isPassField: true),
 
               const Gap(Insets.xxl),
-              SubmitButton(
-                height: 40,
-                onPressed: (l) async {
-                  if (emailCtrl.text.isBlank) {
-                    return Toaster.showError('Please enter email').andReturn(null);
-                  }
-                  if (passwordCtrl.text.isBlank) {
-                    return Toaster.showError('Please enter password').andReturn(null);
-                  }
+              Row(
+                spacing: Insets.lg,
+                children: [
+                  Expanded(
+                    child: SubmitButton(
+                      height: 40,
+                      style: OutlinedButton.styleFrom(
+                        side: BorderSide(color: context.colors.primary),
+                        backgroundColor: context.colors.surface,
+                        foregroundColor: context.colors.primary,
+                      ),
+                      onPressed: (l) async {
+                        l.truthy();
+                        await authCtrl.login(null, null);
+                        l.falsey();
+                      },
+                      child: const Text('Login as Guest'),
+                    ),
+                  ),
+                  Expanded(
+                    child: SubmitButton(
+                      height: 40,
+                      onPressed: (l) async {
+                        if (emailCtrl.text.isBlank) {
+                          return Toaster.showError('Please enter email').andReturn(null);
+                        }
+                        if (passwordCtrl.text.isBlank) {
+                          return Toaster.showError('Please enter password').andReturn(null);
+                        }
 
-                  l.truthy();
-                  await authCtrl.login(emailCtrl.text.trim(), passwordCtrl.text);
-                  l.falsey();
-                },
-                child: const Text('Login'),
+                        l.truthy();
+                        await authCtrl.login(emailCtrl.text.trim(), passwordCtrl.text);
+                        l.falsey();
+                      },
+                      child: const Text('Login With Email'),
+                    ),
+                  ),
+                ],
               ),
 
               const Gap(Insets.lg),
-
-              SubmitButton(
-                height: 40,
-                style: OutlinedButton.styleFrom(
-                  side: BorderSide(color: context.colors.primary),
-                  backgroundColor: context.colors.surface,
-                  foregroundColor: context.colors.primary,
-                ),
-                onPressed: (l) async {
-                  l.truthy();
-                  await authCtrl.login(null, null);
-                  l.falsey();
-                },
-                child: const Text('Login as Guest'),
-              ),
             ],
           ),
         ),

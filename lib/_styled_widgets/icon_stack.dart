@@ -38,11 +38,15 @@ class IconStack extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    List<Widget> ic = [
+    final List<Widget> ic = [
       if (background != null) background!,
       for (final icon in icons)
-        if (icon case IconDataProps i)
-          Icon(i, size: i.size ?? size, color: (i.color ?? color)?.withValues(alpha: i.op))
+        if (icon case final IconDataProps i)
+          Icon(
+            i,
+            size: i.size ?? size,
+            color: (i.color ?? color)?.withValues(alpha: i.op),
+          )
         else
           Icon(icon, size: size, color: color),
     ];

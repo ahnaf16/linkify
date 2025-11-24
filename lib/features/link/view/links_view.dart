@@ -1,3 +1,5 @@
+import 'package:auto_animated_list/auto_animated_list.dart';
+import 'package:automatic_animated_list/automatic_animated_list.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
@@ -11,6 +13,17 @@ import 'package:screwdriver/screwdriver.dart';
 
 class LinksView extends HookConsumerWidget {
   const LinksView({super.key});
+
+  List<LinkData> sortByPinned(List<LinkData> items) {
+    final sorted = items.toList();
+
+    sorted.sort((a, b) {
+      if (a.isPinned != b.isPinned) return a.isPinned ? -1 : 1;
+      return b.createdAt.compareTo(a.createdAt);
+    });
+
+    return sorted;
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -112,56 +125,56 @@ class LinksView extends HookConsumerWidget {
             emptyIcon: const Icon(Icons.link_off_rounded, size: 35),
             emptyText: 'Your saved links will appear here',
             builder: (links) {
-              links.sort((a, b) => a.isPinned == b.isPinned ? 0 : (a.isPinned ? -1 : 1));
-              links = links.sortWith((e) => e.createdAt, Order.orderDate.reverse);
+              return Column(
+                crossAxisAlignment: .start,
 
-              return Refresher(
-                onRefresh: () => linkCtrl.refresh(),
-                child: Column(
-                  crossAxisAlignment: .start,
-
-                  children: [
-                    if (filters.value.isNotEmpty)
-                      SizedBox(
-                        height: 40,
-                        child: ListView.builder(
-                          padding: Pads.lg('lr'),
-                          itemCount: filters.value.length,
-                          scrollDirection: Axis.horizontal,
-                          itemBuilder: (context, index) {
-                            final value = filters.value.toList()[index];
-                            return RemovableChip(
-                              text: value,
-                              value: value,
-                              onDelete: (value) {
-                                filters.value = {...filters.value}..remove(value);
-                                linkCtrl.search('');
-                              },
-                            );
-                          },
-                        ),
-                      ),
-                    Expanded(
-                      child: ListView.separated(
-                        padding: Pads.lg(),
-                        itemCount: links.length,
-                        separatorBuilder: (_, _) => const Gap(Insets.med),
-                        itemBuilder: (BuildContext context, int index) {
-                          final link = links[index];
-                          return LinkCard(
-                            link: link,
-                            syncing: syncing.value,
-                            afterUpdatePop: () => trigger.toggle(),
-                            onSiteNameTap: (name) async {
-                              await linkCtrl.search(name, onlySiteName: true);
-                              filters.value = {...filters.value, name};
+                children: [
+                  if (filters.value.isNotEmpty)
+                    SizedBox(
+                      height: 40,
+                      child: ListView.builder(
+                        padding: Pads.lg('lr'),
+                        itemCount: filters.value.length,
+                        scrollDirection: Axis.horizontal,
+                        itemBuilder: (context, index) {
+                          final value = filters.value.toList()[index];
+                          return RemovableChip(
+                            text: value,
+                            value: value,
+                            onDelete: (value) {
+                              filters.value = {...filters.value}..remove(value);
+                              linkCtrl.search('');
                             },
                           );
                         },
                       ),
                     ),
-                  ],
-                ),
+                  Expanded(
+                    child: Refresher(
+                      onRefresh: () => linkCtrl.refresh(),
+                      child: AutomaticAnimatedList<LinkData>(
+                        padding: Pads.lg(),
+                        items: sortByPinned(links),
+                        keyingFunction: (item) => Key(item.id),
+                        itemBuilder: (context, link, animation) {
+                          return SizeFadeTransition(
+                            key: Key(link.id),
+                            animation: animation,
+                            child: Padding(
+                              padding: Pads.med('b'),
+                              child: LinkCard(
+                                link: link,
+                                syncing: syncing.value,
+                                afterUpdatePop: () => trigger.toggle(),
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+                  const Gap(Insets.offset),
+                ],
               );
             },
           ),
@@ -175,11 +188,10 @@ class LinksView extends HookConsumerWidget {
 }
 
 class LinkCard extends HookConsumerWidget {
-  const LinkCard({super.key, required this.link, required this.syncing, this.afterUpdatePop, this.onSiteNameTap});
+  const LinkCard({super.key, required this.link, required this.syncing, this.afterUpdatePop});
   final LinkData link;
   final bool syncing;
   final Function()? afterUpdatePop;
-  final Function(String name)? onSiteNameTap;
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final linkCtrl = useMemoized(() => ref.read(linkCtrlProvider.notifier));
@@ -204,16 +216,13 @@ class LinkCard extends HookConsumerWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(link.title ?? link.url, style: context.text.titleMedium!.bold, maxLines: 2),
+                      KHero(
+                        tag: link.id + (link.title ?? link.url),
+                        child: Text(link.title ?? link.url, style: context.text.titleMedium!.bold, maxLines: 2),
+                      ),
                       if (link.description.isNotNullOrBlank)
                         Text(link.description!, maxLines: 2, style: context.text.labelMedium),
-                      if (link.siteName.isNotNullOrBlank) ...[
-                        const Gap(Insets.sm),
-                        GestureDetector(
-                          onTap: () => onSiteNameTap?.call(link.siteName!),
-                          child: OptionChip(label: link.siteName!),
-                        ),
-                      ],
+                      if (link.siteName.isNotNullOrBlank) ...[const Gap(Insets.sm), OptionChip(label: link.siteName!)],
                       const Gap(Insets.sm),
                       LinksActionsWidget(
                         link: link,

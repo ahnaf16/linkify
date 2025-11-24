@@ -7,14 +7,8 @@ class SettingsView extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(''),
-      ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [],
-        ),
-      ),
+      appBar: AppBar(title: const Text('')),
+      body: const SingleChildScrollView(child: Column()),
     );
   }
 }

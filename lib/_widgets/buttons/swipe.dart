@@ -97,11 +97,11 @@ class Swipe extends StatelessWidget {
       onVerticalDragUpdate: (dragDetails) => updateVerticalDragDetails = dragDetails,
       onVerticalDragEnd: (endDetails) {
         if (startVerticalDragDetails != null && updateVerticalDragDetails != null) {
-          double dx =
-              (updateVerticalDragDetails!.globalPosition.dx - startVerticalDragDetails!.globalPosition.dx).abs();
-          double dy =
-              (updateVerticalDragDetails!.globalPosition.dy - startVerticalDragDetails!.globalPosition.dy).abs();
-          double velocity = endDetails.primaryVelocity ?? 0.0;
+          final double dx = (updateVerticalDragDetails!.globalPosition.dx - startVerticalDragDetails!.globalPosition.dx)
+              .abs();
+          final double dy = (updateVerticalDragDetails!.globalPosition.dy - startVerticalDragDetails!.globalPosition.dy)
+              .abs();
+          final double velocity = endDetails.primaryVelocity ?? 0.0;
 
           if (dx > verticalMaxWidthThreshold) return;
           if (dy < verticalMinDisplacement) return;
@@ -115,11 +115,11 @@ class Swipe extends StatelessWidget {
       onHorizontalDragUpdate: (dragDetails) => updateHorizontalDragDetails = dragDetails,
       onHorizontalDragEnd: (endDetails) {
         if (startHorizontalDragDetails != null && updateHorizontalDragDetails != null) {
-          double dx =
+          final double dx =
               (updateHorizontalDragDetails!.globalPosition.dx - startHorizontalDragDetails!.globalPosition.dx).abs();
-          double dy =
+          final double dy =
               (updateHorizontalDragDetails!.globalPosition.dy - startHorizontalDragDetails!.globalPosition.dy).abs();
-          double velocity = endDetails.primaryVelocity ?? 0.0;
+          final double velocity = endDetails.primaryVelocity ?? 0.0;
 
           if (dy > horizontalMaxHeightThreshold) return;
           if (dx < horizontalMinDisplacement) return;

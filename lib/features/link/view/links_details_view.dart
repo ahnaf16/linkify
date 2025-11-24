@@ -32,16 +32,23 @@ class LinksDetailsView extends HookConsumerWidget {
                   crossAxisAlignment: .start,
                   spacing: Insets.med,
                   children: [
-                    UImage(link.image ?? Icons.link, dimension: 110, borderRadius: Corners.sm),
+                    PhotoViewWrapper(
+                      image: link.image ?? Icons.link,
+                      child: UImage(link.image ?? Icons.link, dimension: 110, borderRadius: Corners.sm),
+                    ),
+
                     Flexible(
                       child: Column(
                         crossAxisAlignment: .start,
                         spacing: Insets.sm,
                         children: [
-                          Text(
-                            link.title ?? link.url,
-                            style: context.text.titleMedium!.bold.textHeight(1.1),
-                            maxLines: 2,
+                          KHero(
+                            tag: link.id + (link.title ?? link.url),
+                            child: Text(
+                              link.title ?? link.url,
+                              style: context.text.titleMedium!.bold.textHeight(1.1),
+                              maxLines: 2,
+                            ),
                           ),
                           if (link.siteName.isNotNullOrBlank) OptionChip(label: link.siteName!),
                           LinksActionsWidget(link: link),
